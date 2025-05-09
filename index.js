@@ -69,31 +69,44 @@ console.log(freelancerProject.addTotalEarning());
 function Order(customerInfo, itemsList, status) {
     this.customerInfo = customerInfo;
     this.itemsList = itemsList;
-    this.status = "Pending";
+    this.status = status;
 }
 Order.prototype.calculateTotalCost = function () {
     return this.itemsList.reduce((total, item) => total + (item.quantity * item.unitPrice), 0);
 };
 Order.prototype.updateStatus = function (paymentReceived) {
-    this.status = paymentReceived ? "Paid" : "Pending";
+    return this.calculateTotalCost()===paymentReceived ? "Paid" : "Pending";
 };
-Order.prototype.getUrgencyCategory = function () {
+Order.prototype.filterUrgentCategory = function () {
     switch (this.status) {
-        case "Paid":
-            return "Order confirmed.";
         case "Pending":
-            return "Awaiting payment.";
+          console.log("Order needs urgent attention.");
+          break;
+        case "Paid":
+          console.log("Order is being processed.");
+          break;
         default:
-            return "Status unknown.";
-    }
+          console.log("Order status unknown.");
+          break;
+      };
+    
 };
-const ordering=new Order()
+const ordering=new Order({name:"Bisrat",email:"bisrat@gmail.com"},
+    [
+        { productName: "phone", quantity: 1, unitPrice: 12000 },
+        { productName: "earpods", quantity: 1, unitPrice: 2500 },
+        { productName: "charger", quantity: 1, unitPrice: 750 }
+      ],"Pending"  
+);
+console.log(ordering.calculateTotalCost());
+console.log(ordering.updateStatus(15300));
+ordering.filterUrgentCategory();
 // 4
-function Employee(id, name, performanceMetrics) {
+function Employee(id, name, performanceMetrics,feedbackList) {
     this.id = id;
     this.name = name;
     this.performanceMetrics = performanceMetrics;
-    this.feedbackList = [];
+    this.feedbackList =feedbackList;
 }
 Employee.prototype.calculateAverageScore = function () {
     const scores = Object.values(this.performanceMetrics);
@@ -111,27 +124,34 @@ Employee.prototype.getPerformanceLevel = function () {
     }
 };
 Employee.prototype.addFeedback = function (comment) {
-    if (comment) {
-        this.feedbackList.push(comment);
-    }
+    this.feedbackList.push(comment);
 };
+const employeeDetail=new Employee(12345,"Tsega Hagos",
+    {communication:40,
+    reliability:43, 
+    efficiency:35},
+    ["You really did a great job", "You need to do more on time management","You need some improvement on the leadership skills"]
+
+);
+employeeDetail.addFeedback("Keep it up");
+console.log(employeeDetail);
+console.log(employeeDetail.calculateAverageScore());
+console.log(employeeDetail.getPerformanceLevel());
+
 // 5
-function Course(title, instructor) {
+function Course(title, instructor,students) {
     this.title = title;
     this.instructor = instructor;
-    this.enrolledStudents = [];
+    this.students =students;
 }
-Course.prototype.addStudent = function (student) {
-    this.enrolledStudents.push(student);
-};
 Course.prototype.getCompletedStudentNames = function () {
-    return this.enrolledStudents
+    return this.students
         .filter(student => student.completionStatus)
         .map(student => student.name);
 };
-Course.prototype.countStudentsByExpertise = function () {
+Course.prototype.countStudentsByExpertise= function () {
     const expertiseCounts = {};
-    this.enrolledStudents.forEach(student => {
+    this.students.forEach(student => {
         const expertise = student.expertise;
         if (!expertiseCounts[expertise]) {
             expertiseCounts[expertise] = 0;
@@ -141,7 +161,22 @@ Course.prototype.countStudentsByExpertise = function () {
     return expertiseCounts;
 };
 Course.prototype.instructorMessage = function () {
-    return this.enrolledStudents.length > 5
+    return this.students.length > 5
         ? "You have a full class!"
         : "Consider recruiting more students.";
 };
+const takeCourses=new Course("Frontend Development", 
+    {name: "Dawit Hailu", expertise: "Web Developer" },
+    [
+        { name: "Aron", completionStatus: true, expertise: "Data Science" },
+        { name: "Danny", completionStatus: false, expertise: "Web Development" },
+        { name: "William", completionStatus: true, expertise: "Web Development" },
+        { name: "Kidus", completionStatus: true, expertise: "Web Development" },
+        { name: "Silvana", completionStatus: false, expertise: "sotware development" }
+      ]
+      
+      
+);
+console.log(takeCourses.instructorMessage());
+console.log(takeCourses.getCompletedStudentNames());
+console.log(takeCourses.countStudentsByExpertise());
